@@ -1,8 +1,14 @@
 class Book {
-    constructor(name, author, pages) {
+    constructor(
+        name = 'Unknown',
+        author = 'Unknown',
+        pages = '0',
+        isRead = false
+    ) {
         this.name = name
         this.author = author
         this.pages = pages
+        this.isRead = isRead
     }
 }
 
@@ -21,90 +27,108 @@ class Library {
     removeBook(name) {
         this.books = this.books.filter((book) => book.name !== name)
     }
-    
+
     getBook(name) {
         return this.books.find((book) => book.name === name)
     }
 
     isInLibrary(bookToCheck) {
         return this.books.some((b) => b.name === bookToCheck.name)
-    }   
+    }
 }
 
 
-class UI {
-    constructor(library) {
-        this.library = library
-        this.bookGrid = document.getElementById('bookGrid')
+// User Interface functions and global variables.
+const bookGrid = document.getElementById('bookGrid')
+
+function updateBookGrid() {
+    resetBookGrid()
+    for (let book of library.books) {
+        createBookCard(book)
+    }
+}
+
+function resetBookGrid() {
+    bookGrid.innerHTML = ''
+}
+
+function createBookCard(book) {
+    const bookCard = document.createElement('div')
+    const name = document.createElement('p')
+    const author = document.createElement('p')
+    const pages = document.createElement('p')
+    const buttonGroup = document.createElement('div')
+    const readBtn = document.createElement('button')
+    const removeBtn = document.createElement('button')
+
+    bookCard.classList.add('book-card')
+    buttonGroup.classList.add('button-group')
+    readBtn.classList.add('btn')
+    removeBtn.classList.add('btn')
+    removeBtn.onclick = removeBook
+
+    name.textContent = `"${book.name}"`
+    author.textContent = book.author
+    pages.textContent = `${book.pages} pages`
+    removeBtn.textContent = 'Remove'
+
+    if (book.isRead) {
+        readBtn.textContent = 'Read'
+        readBtn.classList.add('btn-light-green')
+    } else {
+        readBtn.textContent = 'Not read'
+        readBtn.classList.add('btn-light-red')
     }
 
-    updateBookGrid() {
-        this.resetBookGrid()
-        for (let book of this.library.books) {
-          this.createBookCard(book)
-        }
-    }
+    bookCard.appendChild(name)
+    bookCard.appendChild(author)
+    bookCard.appendChild(pages)
+    buttonGroup.appendChild(readBtn)
+    buttonGroup.appendChild(removeBtn)
+    bookCard.appendChild(buttonGroup)
+    bookGrid.appendChild(bookCard)
+}
 
-    resetBookGrid() {
-        bookGrid.innerHTML = ''
-    }
-
-    createBookCard(book) {
-        const bookCard = document.createElement('div')
-        const name = document.createElement('p')
-        const author = document.createElement('p')
-        const pages = document.createElement('p')
-        const buttonGroup = document.createElement('div')
-        const readBtn = document.createElement('button')
-        const removeBtn = document.createElement('button')
-      
-        bookCard.classList.add('book-card')
-        buttonGroup.classList.add('button-group')
-        readBtn.classList.add('btn')
-        removeBtn.classList.add('btn')
-        // readBtn.onclick = toggleRead
-        removeBtn.onclick = this.removeBook
-      
-        name.textContent = `"${book.name}"`
-        author.textContent = book.author
-        pages.textContent = `${book.pages} pages`
-        removeBtn.textContent = 'Remove'
-      
-        if (book.isRead) {
-          readBtn.textContent = 'Read'
-          readBtn.classList.add('btn-light-green')
-        } else {
-          readBtn.textContent = 'Not read'
-          readBtn.classList.add('btn-light-red')
-        }
-      
-        bookCard.appendChild(name)
-        bookCard.appendChild(author)
-        bookCard.appendChild(pages)
-        buttonGroup.appendChild(readBtn)
-        buttonGroup.appendChild(removeBtn)
-        bookCard.appendChild(buttonGroup)
-        this.bookGrid.appendChild(bookCard)
-    }
-    
-    removeBook(e) {
-        const name = e.target.parentNode.parentNode.firstChild.innerHTML.replaceAll(
-          '"',
-          ''
-        )
-        ui.library.removeBook(name)
-        ui.updateBookGrid()
-    } 
+function removeBook(e) {
+    const name = e.target.parentNode.parentNode.firstChild.innerHTML.replaceAll(
+        '"',
+        ''
+    )
+    library.removeBook(name)
+    updateBookGrid()
+    saveLocal()
 }
 
 
-// Main script start.
-const ui = new UI(new Library())
+// Local Storage functions.
+function saveLocal() {
+    localStorage.setItem('library', JSON.stringify(library.books))
+}
+
+function restoreLocal() {
+    const books = JSON.parse(localStorage.getItem('library'))
+    if (books) {
+        library.books = books.map((book) => JSONToBook(book))
+    } else {
+        library.books = []
+    }
+}
+
+
+// Helper functions.
+function JSONToBook(book) {
+    return new Book(book.name, book.author, book.pages, book.isRead)
+}
+
+
+// Main script.
+const library = new Library()
 
 // Added hard coded values for testing.
-ui.library.addBook(new Book('title', 'autor', 13))
-ui.library.addBook(new Book('title1', 'autor', 13))
-ui.library.addBook(new Book('title2', 'autor', 13))
-ui.library.addBook(new Book('title3', 'autor', 13))
+restoreLocal()
+// library.addBook(new Book('title', 'author', 13))
+// library.addBook(new Book('title1', 'author', 13))
+// library.addBook(new Book('title2', 'author', 13))
+// library.addBook(new Book('title3', 'author', 13))
+updateBookGrid()
 
-ui.updateBookGrid()
