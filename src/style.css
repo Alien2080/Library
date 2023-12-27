@@ -31,7 +31,9 @@ body {
     gap: 20px;
     padding: 20px;
     border-radius: 5px;
-    background-color: var(--white);
+    /* background-color: var(--white); */
+    /* background-color: linear-gradient(--green, --white); */
+    background-image: linear-gradient(285deg, var(--green), var(--white));
     box-shadow: var(--shadow);
     line-height: 1.2;
   }
