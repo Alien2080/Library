@@ -63,7 +63,7 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  
+
 }
 
 input {
@@ -122,4 +122,3 @@ input[type='number'] {
   padding: 10px;
   border-radius: 8px;
 }
-

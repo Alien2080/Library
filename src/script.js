@@ -114,7 +114,7 @@ function closeAddBookModal() {
 function handleKeyboardInput(e) {
     if (e.key === 'Escape') {
         closeAddBookModal()
-    }   
+    }
 }
 
 function getBookFromInputForm() {
@@ -193,9 +193,9 @@ db.collection("users").add({
     last: "Lovelace",
     born: 1815
 })
-.then((docRef) => {
-    console.log("Document written with ID: ", docRef.id);
-})
-.catch((error) => {
-    console.error("Error adding document: ", error);
-});
+    .then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+    })
+    .catch((error) => {
+        console.error("Error adding document: ", error);
+    });
