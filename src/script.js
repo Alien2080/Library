@@ -39,16 +39,6 @@ class Library {
 
 
 // User Interface.
-// Global variables.
-const bookGrid = document.getElementById('bookGrid')
-const addBookBtn = document.getElementById('addBookBtn')
-const addBookModal = document.getElementById('addBookModal')
-const addBookForm = document.getElementById('addBookForm')
-
-// Events.
-addBookBtn.onclick = openAddBookModal
-addBookForm.onsubmit = addBook
-window.onkeydown = handleKeyboardInput
 
 // Functions.
 function updateBookGrid() {
@@ -176,6 +166,36 @@ function JSONToBook(book) {
 
 
 // Main script.
+// Global variables.
 const library = new Library()
+
+const bookGrid = document.getElementById('bookGrid')
+const addBookBtn = document.getElementById('addBookBtn')
+const addBookModal = document.getElementById('addBookModal')
+const addBookForm = document.getElementById('addBookForm')
+
+// Events.
+addBookBtn.onclick = openAddBookModal
+addBookForm.onsubmit = addBook
+window.onkeydown = handleKeyboardInput
+
 restoreLocal()
 updateBookGrid()
+
+
+// Firestore.
+// Initialize Cloud Firestore and get a reference to the service
+const db = firebase.firestore();
+
+// some test data to firestore.
+db.collection("users").add({
+    first: "Ada",
+    last: "Lovelace",
+    born: 1815
+})
+.then((docRef) => {
+    console.log("Document written with ID: ", docRef.id);
+})
+.catch((error) => {
+    console.error("Error adding document: ", error);
+});
