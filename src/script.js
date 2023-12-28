@@ -38,9 +38,19 @@ class Library {
 }
 
 
-// User Interface functions and global variables.
+// User Interface.
+// Global variables.
 const bookGrid = document.getElementById('bookGrid')
+const addBookBtn = document.getElementById('addBookBtn')
+const addBookModal = document.getElementById('addBookModal')
+const addBookForm = document.getElementById('addBookForm')
 
+// Events.
+addBookBtn.onclick = openAddBookModal
+addBookForm.onsubmit = addBook
+window.onkeydown = handleKeyboardInput
+
+// Functions.
 function updateBookGrid() {
     resetBookGrid()
     for (let book of library.books) {
@@ -99,6 +109,50 @@ function removeBook(e) {
     saveLocal()
 }
 
+function openAddBookModal() {
+    addBookForm.reset()
+    addBookModal.classList.add('active')
+}
+
+function closeAddBookModal() {
+    addBookModal.classList.remove('active')
+    // overlay.classList.remove('active')
+    errorMsg.classList.remove('active')
+    errorMsg.textContent = ''
+}
+
+function handleKeyboardInput(e) {
+    if (e.key === 'Escape') {
+        closeAddBookModal()
+    }   
+}
+
+function getBookFromInputForm() {
+    const name = document.getElementById('name').value
+    const author = document.getElementById('author').value
+    const pages = document.getElementById('pages').value
+    const isRead = document.getElementById('isRead').value
+
+    return new Book(name, author, pages, isRead)
+}
+
+
+function addBook(e) {
+    e.preventDefault()
+    const newBook = getBookFromInputForm()
+
+    if (library.isInLibrary(newBook)) {
+        errorMsg.textContent = 'This book already exists in your library'
+        errorMsg.classList.add('active')
+        return
+    }
+
+    library.addBook(newBook)
+    saveLocal()
+    updateBookGrid()
+    closeAddBookModal()
+}
+
 
 // Local Storage functions.
 function saveLocal() {
@@ -123,12 +177,5 @@ function JSONToBook(book) {
 
 // Main script.
 const library = new Library()
-
-// Added hard coded values for testing.
 restoreLocal()
-// library.addBook(new Book('title', 'author', 13))
-// library.addBook(new Book('title1', 'author', 13))
-// library.addBook(new Book('title2', 'author', 13))
-// library.addBook(new Book('title3', 'author', 13))
 updateBookGrid()
-

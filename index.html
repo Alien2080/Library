@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,24 @@
     <link rel="stylesheet" href=".\src\style.css" />
     <script src=".\src\script.js" defer></script>
 </head>
+
 <body>
-    <button class="btn add-book-btn" id="addBookBtn">+ Add Book</button>
+    <button id="addBookBtn">+ Add Book</button>
     <div class="book-grid" id="bookGrid"></div>
+    <div class="modal" id="addBookModal">
+        <form class="add-book-form" id="addBookForm">
+            <h3>Add new book</h3>
+            <input class="input" type="text" id="name" placeholder="Name" required maxlength="100" />
+            <p class="error-msg" id="errorMsg"></p>
+            <input class="input" type="text" id="author" placeholder="Author" required maxlength="100" />
+            <input class="input" type="number" id="pages" placeholder="Pages" required max="10000" />
+            <div class="is-read">
+                <label for="is-read">Have you read it?</label>
+                <input class="checkbox" type="checkbox" id="isRead" />
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 </body>
+
 </html>
