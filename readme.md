@@ -7,10 +7,10 @@ Saves library to ~~[Local Storage](https://developer.mozilla.org/en-US/docs/Web/
 A List of books. Books can be removed and added.  
 
 ## Planned features
-- ~~add books  ~~
+- ~~add books~~
 - set is read on books  
 - styling  
-- ~~persistant storage using [Firebase Firestore](https://firebase.google.com/docs/firestore/quickstart)  ~~
+- ~~persistant storage using [Firebase Firestore](https://firebase.google.com/docs/firestore/quickstart)~~
 - authentication for Firebase
 - rules setup in Firebase
 
