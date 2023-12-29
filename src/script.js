@@ -97,6 +97,7 @@ function removeBook(e) {
     library.removeBook(name)
     updateBookGrid()
     saveLocal()
+    removeBookFromDB(name)
 }
 
 function openAddBookModal() {
@@ -139,6 +140,7 @@ function addBook(e) {
 
     library.addBook(newBook)
     saveLocal()
+    saveBookToDB(newBook)
     updateBookGrid()
     closeAddBookModal()
 }
@@ -146,6 +148,7 @@ function addBook(e) {
 
 // Local Storage functions.
 function saveLocal() {
+    // Replace the entire library reference with the new library.
     localStorage.setItem('library', JSON.stringify(library.books))
 }
 
@@ -156,6 +159,44 @@ function restoreLocal() {
     } else {
         library.books = []
     }
+    updateBookGrid()
+}
+
+// FireStore.
+function saveBookToDB(book) {
+    db.collection('library').add({
+            name: book.name,
+            author: book.author,
+            pages: book.pages,
+            isRead: book.isRead
+    })
+}
+
+async function removeBookFromDB(name) {
+    db.collection('library').doc(await getBookIDFromName(name)).delete()
+    updateBookGrid()
+}
+
+async function getBookIDFromName(name) {
+    const snapshot = await db
+        .collection('library')
+        .where('name', '==', name)
+        .get()
+    const bookID = snapshot.docs.map((doc) => doc.id).join('')
+    return bookID
+}
+
+async function getBooksFromDB() {
+    let snapshot = await db.collection('library').get()
+
+    library.books = snapshot.docs.map((doc) => new Book(
+        doc.data().name,
+        doc.data().author,
+        doc.data().pages,
+        doc.data().isRead
+    ))
+
+    updateBookGrid()
 }
 
 
@@ -169,6 +210,8 @@ function JSONToBook(book) {
 // Global variables.
 const library = new Library()
 
+const db = firebase.firestore();
+
 const bookGrid = document.getElementById('bookGrid')
 const addBookBtn = document.getElementById('addBookBtn')
 const addBookModal = document.getElementById('addBookModal')
@@ -179,23 +222,5 @@ addBookBtn.onclick = openAddBookModal
 addBookForm.onsubmit = addBook
 window.onkeydown = handleKeyboardInput
 
-restoreLocal()
-updateBookGrid()
-
-
-// Firestore.
-// Initialize Cloud Firestore and get a reference to the service
-const db = firebase.firestore();
-
-// some test data to firestore.
-db.collection("users").add({
-    first: "Ada",
-    last: "Lovelace",
-    born: 1815
-})
-    .then((docRef) => {
-        console.log("Document written with ID: ", docRef.id);
-    })
-    .catch((error) => {
-        console.error("Error adding document: ", error);
-    });
+// restoreLocal()
+getBooksFromDB()
