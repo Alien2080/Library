@@ -10,8 +10,26 @@
 </head>
 
 <body>
-    <button id="addBookBtn">+ Add Book</button>
-    <div class="book-grid" id="bookGrid"></div>
+    <header class="header">
+        <div class="container">
+            <h1>library</h1>
+            <nav>
+                <div class="lds-dual-ring active" id="loadingRing"></div>
+                <div class="logged-out" id="loggedOut">
+                    <button class="btn" id="logInBtn">Log in</button>
+                </div>
+                <div class="logged-in" id="loggedIn">
+                    <button class="btn" id="accountBtn">Account</button>
+                    <button class="btn" id="logOutBtn">Log out</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <main class="main container">
+        <button class="btn btn-add" id="addBookBtn">+ Add book</button>
+        <div class="book-grid" id="bookGrid"></div>
+    </main>
+
     <div class="modal" id="addBookModal">
         <form class="add-book-form" id="addBookForm">
             <h3>Add new book</h3>
@@ -23,13 +41,19 @@
                 <label for="is-read">Have you read it?</label>
                 <input class="checkbox" type="checkbox" id="isRead" />
             </div>
-            <button type="submit">Submit</button>
+            <button class="btn btn-light-green" type="submit">Submit</button>
         </form>
     </div>
+    <div class="modal" id="accountModal"></div>
+    <div class="overlay" id="overlay"></div>
 
     <!-- Firebase Cloud Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script> -->
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBnHIfhcWNxcakhPPIJPtLwBbJrrl0uWnc",

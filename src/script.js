@@ -100,22 +100,57 @@ function removeBook(e) {
     removeBookFromDB(name)
 }
 
+function setupNavbar(user) {
+    if (user) {
+        loggedIn.classList.add('active')
+        loggedOut.classList.remove('active')
+    } else {
+        loggedIn.classList.remove('active')
+        loggedOut.classList.add('active')
+    }
+    loadingRing.classList.remove('active')
+}
+
+function setupAccountModal(user) {
+    if (user) {
+        accountModal.innerHTML = `
+        <p>Logged in as</p>
+        <p><strong>${user.email.split('@')[0]}</strong></p>`
+    } else {
+        accountModal.innerHTML = ''
+    }
+}
+
 function openAddBookModal() {
     addBookForm.reset()
     addBookModal.classList.add('active')
+    overlay.classList.add('active')
 }
 
 function closeAddBookModal() {
     addBookModal.classList.remove('active')
-    // overlay.classList.remove('active')
+    overlay.classList.remove('active')
     errorMsg.classList.remove('active')
     errorMsg.textContent = ''
 }
 
+function openAccountModal() {
+    accountModal.classList.add('active')
+    overlay.classList.add('active')
+}
+
+function closeAccountModal() {
+    accountModal.classList.remove('active')
+    overlay.classList.remove('active')
+}
+
+function closeAllModals() {
+    closeAddBookModal()
+    closeAccountModal()
+}
+
 function handleKeyboardInput(e) {
-    if (e.key === 'Escape') {
-        closeAddBookModal()
-    }
+    if (e.key === 'Escape') closeAllModals()
 }
 
 function getBookFromInputForm() {
@@ -146,6 +181,23 @@ function addBook(e) {
 }
 
 
+function toggleRead(e) {
+    const title = e.target.parentNode.parentNode.firstChild.innerHTML.replaceAll(
+        '"',
+        ''
+    )
+    const book = library.getBook(title)
+
+    if (auth.currentUser) {
+        toggleBookIsReadDB(book)
+    } else {
+        book.isRead = !book.isRead
+        saveLocal()
+        updateBookGrid()
+    }
+}
+
+
 // Local Storage functions.
 function saveLocal() {
     // Replace the entire library reference with the new library.
@@ -163,12 +215,24 @@ function restoreLocal() {
 }
 
 // FireStore.
+// Auth
+const auth = firebase.auth()
+
+function signIn() {
+    const provider = new firebase.auth.GoogleAuthProvider()
+    auth.signInWithPopup(provider)
+}
+
+function signOut() {
+    auth.signOut()
+}
+
 function saveBookToDB(book) {
     db.collection('library').add({
-            name: book.name,
-            author: book.author,
-            pages: book.pages,
-            isRead: book.isRead
+        name: book.name,
+        author: book.author,
+        pages: book.pages,
+        isRead: book.isRead
     })
 }
 
@@ -210,17 +274,45 @@ function JSONToBook(book) {
 // Global variables.
 const library = new Library()
 
-const db = firebase.firestore();
+// Firebase and auth
+const db = firebase.firestore()
+let unsubscribe
+
+const logInBtn = document.getElementById('logInBtn')
+const logOutBtn = document.getElementById('logOutBtn')
 
 const bookGrid = document.getElementById('bookGrid')
+const accountBtn = document.getElementById('accountBtn')
+const accountModal = document.getElementById('accountModal')
 const addBookBtn = document.getElementById('addBookBtn')
 const addBookModal = document.getElementById('addBookModal')
+const errorMsg = document.getElementById('errorMsg')
+const overlay = document.getElementById('overlay')
 const addBookForm = document.getElementById('addBookForm')
+const loggedIn = document.getElementById('loggedIn')
+const loggedOut = document.getElementById('loggedOut')
+const loadingRing = document.getElementById('loadingRing')
 
 // Events.
+overlay.onclick = closeAllModals
+accountBtn.onclick = openAccountModal
 addBookBtn.onclick = openAddBookModal
 addBookForm.onsubmit = addBook
 window.onkeydown = handleKeyboardInput
+logInBtn.onclick = signIn
+logOutBtn.onclick = signOut
 
 // restoreLocal()
-getBooksFromDB()
+// getBooksFromDB()
+
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        setupRealTimeListener()
+    } else {
+        if (unsubscribe) unsubscribe()
+        restoreLocal()
+        updateBookGrid()
+    }
+    setupAccountModal(user)
+    setupNavbar(user)
+})
