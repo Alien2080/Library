@@ -259,6 +259,12 @@ function saveBookToDB(book) {
     })
 }
 
+async function toggleBookIsReadDB(book) {
+    db.collection('library')
+      .doc(await getBookIDFromName(book.name))
+      .update({ isRead: !book.isRead })
+  }
+
 async function removeBookFromDB(name) {
     db.collection('library').doc(await getBookIDFromName(name)).delete()
     updateBookGrid()
