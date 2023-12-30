@@ -229,11 +229,16 @@ function signOut() {
 
 function setupRealTimeListener() {
     unsubscribe = db
-        .collection('books')
+        .collection('library')
         .where('ownerId', '==', auth.currentUser.uid)
         .orderBy('createdAt')
         .onSnapshot((snapshot) => {
-            library.books = docsToBooks(snapshot.docs)
+            library.books = snapshot.docs.map((doc) => new Book(
+                doc.data().name,
+                doc.data().author,
+                doc.data().pages,
+                doc.data().isRead
+            ))
             updateBookGrid()
         })
 }
