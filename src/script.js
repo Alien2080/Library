@@ -173,10 +173,14 @@ function addBook(e) {
         return
     }
 
-    library.addBook(newBook)
-    saveLocal()
-    saveBookToDB(newBook)
-    updateBookGrid()
+    if (auth.currentUser) {
+        saveBookToDB(newBook)
+    } else {
+        library.addBook(newBook)
+        saveLocal()
+        updateBookGrid()
+    }
+
     closeAddBookModal()
 }
 
@@ -230,7 +234,7 @@ function signOut() {
 function setupRealTimeListener() {
     unsubscribe = db
         .collection('library')
-        .where('ownerId', '==', auth.currentUser.uid)
+        .where('ownerID', '==', auth.currentUser.uid)
         .orderBy('createdAt')
         .onSnapshot((snapshot) => {
             library.books = snapshot.docs.map((doc) => new Book(
@@ -245,10 +249,12 @@ function setupRealTimeListener() {
 
 function saveBookToDB(book) {
     db.collection('library').add({
+        ownerID: auth.currentUser.uid,
         name: book.name,
         author: book.author,
         pages: book.pages,
-        isRead: book.isRead
+        isRead: book.isRead,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
     })
 }
 
