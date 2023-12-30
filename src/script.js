@@ -65,6 +65,7 @@ function createBookCard(book) {
     buttonGroup.classList.add('button-group')
     readBtn.classList.add('btn')
     removeBtn.classList.add('btn')
+    readBtn.onclick = toggleRead
     removeBtn.onclick = removeBook
 
     name.textContent = `"${book.name}"`
