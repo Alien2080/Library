@@ -268,6 +268,7 @@ async function getBookIDFromName(name) {
     const snapshot = await db
         .collection('library')
         .where('name', '==', name)
+        .where('ownerID', '==', auth.currentUser.uid)
         .get()
     const bookID = snapshot.docs.map((doc) => doc.id).join('')
     return bookID
